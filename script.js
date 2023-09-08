@@ -12,13 +12,17 @@ const inputCadence = document.querySelector(".form__input--cadence");
 const inputElevation = document.querySelector(".form__input--elevation");
 
 if (navigator.geolocation) {
+  // Fetching user position
   navigator.geolocation.getCurrentPosition(
     function (position) {
+      // Fetching approximate latitude and longitude
       const { latitude, longitude } = position.coords;
       const coords = [latitude, longitude];
 
-      const googleMaps = `https://www.google.pt/maps/@${latitude},${longitude}`;
+      //   const googleMaps = `https://www.google.pt/maps/@${latitude},${longitude}`;
+      //   console.log(googleMaps);
 
+      // Displaying leaflet map on user's coordinates
       const map = L.map("map").setView(coords, 12);
 
       L.tileLayer("https://tile.openstreetmap.fr/hot/{z}/{x}/{y}.png", {
@@ -30,8 +34,6 @@ if (navigator.geolocation) {
         .addTo(map)
         .bindPopup("A pretty CSS popup.<br> Easily customizable.")
         .openPopup();
-
-      console.log(googleMaps);
     },
     function () {
       alert("Unable to retrieve your location.");
