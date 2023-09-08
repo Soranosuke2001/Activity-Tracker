@@ -24,17 +24,33 @@ if (navigator.geolocation) {
 
       // Displaying leaflet map on user's coordinates
       const map = L.map("map").setView(coords, 12);
-
       L.tileLayer("https://tile.openstreetmap.fr/hot/{z}/{x}/{y}.png", {
         attribution:
           '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       }).addTo(map);
 
-      L.marker(coords)
-        .addTo(map)
-        .bindPopup("A pretty CSS popup.<br> Easily customizable.")
-        .openPopup();
+      map.on("click", function (mapEvent) {
+        // Fetching the position where the user clicked
+        const { lat, lng } = mapEvent.latlng;
+        const pinCoord = [lat, lng];
+
+        // Adding the popup marker to the place where the user clicked
+        L.marker(pinCoord)
+          .addTo(map)
+          .bindPopup(
+            L.popup({
+              maxWidth: 250,
+              minWidth: 100,
+              autoClose: false,
+              closeOnClick: false,
+              className: "running-popup",
+            })
+          )
+          .setPopupContent("Workout")
+          .openPopup();
+      });
     },
+    // If the user location could not be fetched
     function () {
       alert("Unable to retrieve your location.");
     }
