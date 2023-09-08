@@ -25,6 +25,8 @@ class Workout {
 
 // Child Running class
 class Running extends Workout {
+  type = "running";
+
   constructor(coords, distance, duration, cadence) {
     super(coords, distance, duration);
     this.cadence = cadence;
@@ -43,6 +45,8 @@ class Running extends Workout {
 
 // Child Cycling class
 class Cycling extends Workout {
+  type = "cycling";
+
   constructor(coords, distance, duration, elevationGain) {
     super(coords, distance, duration);
     this.elevationGain = elevationGain;
@@ -61,6 +65,7 @@ class Cycling extends Workout {
 class App {
   #map;
   #mapEvent;
+  #workouts = [];
 
   constructor() {
     // On page load, run the _getPosition() function
@@ -124,28 +129,72 @@ class App {
     inputCadence.closest(".form__row").classList.toggle("form__row--hidden");
   }
 
+  // Check data validity
+  _checkDataValidity(type, ...inputs) {
+    if (type === "running") {
+      const validValue = inputs.every(input => Number.isFinite(input));
+
+      const positiveInt = inputs.every(input => input > 0);
+
+      if (validValue && positiveInt) return true;
+      else return false;
+    }
+
+    if (type === "cycling") {
+      const validValue = inputs.every(input => Number.isFinite(input));
+      inputs.pop();
+      const positiveInt = inputs.every(input => input > 0);
+
+      if (validValue && positiveInt) return true;
+      else return false;
+    }
+  }
+
   // User submits a new workout
   _newWorkout(e) {
     e.preventDefault();
+
+    let workout;
 
     // Fetching the position where the user clicked
     const { lat, lng } = this.#mapEvent.latlng;
     const pinCoord = [lat, lng];
 
-    // Adding the popup marker to the place where the user clicked
-    L.marker(pinCoord)
-      .addTo(this.#map)
-      .bindPopup(
-        L.popup({
-          maxWidth: 250,
-          minWidth: 100,
-          autoClose: false,
-          closeOnClick: false,
-          className: "running-popup",
-        })
-      )
-      .setPopupContent("Workout")
-      .openPopup();
+    // Get form data
+    const type = inputType.value;
+    const distance = +inputDistance.value;
+    const duration = +inputDuration.value;
+
+    // Check the type of workout
+    if (type === "running") {
+      const cadence = +inputCadence.value;
+
+      // Check data validity
+      if (!this._checkDataValidity(type, distance, duration, cadence))
+        return alert("Please enter a valid input: (distance/duration/cadence)");
+
+      // Create a new running instance
+      workout = new Running(pinCoord, distance, duration, cadence);
+    }
+
+    if (type === "cycling") {
+      const elevation = +inputElevation.value;
+
+      // Check data validity
+      if (!this._checkDataValidity(type, distance, duration, elevation))
+        return alert(
+          "Please enter a valid input: (distance/duration/elevation)"
+        );
+
+      // Create a new cycling instance
+      workout = new Cycling(pinCoord, distance, duration, elevation);
+    }
+
+    // Add the workout to the workout array
+    this.#workouts.push(workout);
+
+    // Display the workout pin on the map
+    this.workoutPin(workout);
 
     // Clear input fields
     inputDistance.value =
@@ -153,6 +202,23 @@ class App {
       inputElevation.value =
       inputCadence.value =
         "";
+  }
+
+  workoutPin(workout) {
+    // Adding the popup marker to the place where the user clicked
+    L.marker(workout.coords)
+      .addTo(this.#map)
+      .bindPopup(
+        L.popup({
+          maxWidth: 250,
+          minWidth: 100,
+          autoClose: false,
+          closeOnClick: false,
+          className: `${workout.type}-popup`,
+        })
+      )
+      .setPopupContent(workout.type)
+      .openPopup();
   }
 }
 
