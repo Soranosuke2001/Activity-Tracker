@@ -11,6 +11,53 @@ const inputDuration = document.querySelector(".form__input--duration");
 const inputCadence = document.querySelector(".form__input--cadence");
 const inputElevation = document.querySelector(".form__input--elevation");
 
+// Parent Workout class
+class Workout {
+  id = (Date.now() + "").slice(-10);
+  date = new Date();
+
+  constructor(coords, distance, duration) {
+    this.coords = coords;
+    this.distance = distance;
+    this.duration = duration;
+  }
+}
+
+// Child Running class
+class Running extends Workout {
+  constructor(coords, distance, duration, cadence) {
+    super(coords, distance, duration);
+    this.cadence = cadence;
+
+    // Calculate the pace of the workout
+    this.calcPace();
+  }
+
+  // Calculate the pace of the workout
+  calcPace() {
+    // km/min
+    this.pace = this.distance / this.duration;
+    return this.pace;
+  }
+}
+
+// Child Cycling class
+class Cycling extends Workout {
+  constructor(coords, distance, duration, elevationGain) {
+    super(coords, distance, duration);
+    this.elevationGain = elevationGain;
+
+    // Calculate the speed of the workout
+    this.calcSpeed();
+  }
+
+  // Calculate the speed of the workout
+  calcSpeed() {
+    // km/hr
+    this.speed = this.distance / (this.duration / 60);
+    return this.speed;
+  }
+}
 class App {
   #map;
   #mapEvent;
@@ -109,52 +156,5 @@ class App {
   }
 }
 
-class Workout {
-  id = (Date.now() + "").slice(-10);
-  date = new Date();
-
-  constructor(coords, distance, duration) {
-    this.coords = coords;
-    this.distance = distance;
-    this.duration = duration;
-  }
-}
-
-class Running extends Workout {
-  constructor(coords, distance, duration, cadence) {
-    super(coords, distance, duration);
-    this.cadence = cadence;
-
-    // Calculate the pace of the workout
-    this.calcPace();
-  }
-
-  // Calculate the pace of the workout
-  calcPace() {
-    // km/min
-    this.pace = this.distance / this.duration;
-    return this.pace;
-  }
-}
-
-class Cycling extends Workout {
-  constructor(coords, distance, duration, elevationGain) {
-    super(coords, distance, duration);
-    this.elevationGain = elevationGain;
-
-    // Calculate the speed of the workout
-    this.calcSpeed();
-  }
-  
-  // Calculate the speed of the workout
-  calcSpeed() {
-    // km/hr
-    this.speed = this.distance / (this.duration / 60);
-    return this.speed;
-  }
-}
-
 // Initializing the app class
 const app = new App();
-
-const run1 = new Running([])
