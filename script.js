@@ -372,6 +372,12 @@ class App {
   _saveWorkouts() {
     localStorage.setItem("workouts", JSON.stringify(this.#workouts));
   }
+
+  // Clear all saved workouts
+  reset() {
+    localStorage.removeItem("workouts");
+    location.reload();
+  }
 }
 
 // Initializing the app class
