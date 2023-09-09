@@ -90,6 +90,7 @@ class App {
   #map;
   #mapEvent;
   #workouts = [];
+  #mapZoom = 13;
 
   constructor() {
     // On page load, run the _getPosition() function
@@ -100,6 +101,9 @@ class App {
 
     // Changing form inputs on workout option change
     inputType.addEventListener("change", this._toggleElevationField);
+
+    // Pan to each workout pin event handler
+    containerWorkouts.addEventListener("click", this._panToPin.bind(this));
   }
 
   // Fetch user location
@@ -125,7 +129,7 @@ class App {
     const coords = [latitude, longitude];
 
     // Displaying leaflet map on user's coordinates
-    this.#map = L.map("map").setView(coords, 12);
+    this.#map = L.map("map").setView(coords, this.#mapZoom);
     L.tileLayer("https://tile.openstreetmap.fr/hot/{z}/{x}/{y}.png", {
       attribution:
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
@@ -258,6 +262,26 @@ class App {
         `${workout.type === "running" ? "🏃‍♂️" : "🚴‍♀️"} ${workout.description}`
       )
       .openPopup();
+  }
+
+  _panToPin(e) {
+    const workoutElement = e.target.closest(".workout");
+
+    // Do nothing if a workout was not clicked
+    if (!workoutElement) return;
+
+    // Find the corresponding workout
+    const workout = this.#workouts.find(
+      work => work.id === workoutElement.dataset.id
+    );
+
+    // Setting the viewport to the selected workout pin
+    this.#map.setView(workout.coords, this.#mapZoom, {
+      animate: true,
+      pan: {
+        duration: 1,
+      },
+    });
   }
 
   // Display the workouts
