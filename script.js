@@ -93,8 +93,11 @@ class App {
   #mapZoom = 13;
 
   constructor() {
-    // On page load, run the _getPosition() function
+    // Setting up Leaflet API
     this._getPosition();
+
+    // Fetch saved workouts
+    this._fetchWorkouts();
 
     // User submits a new workout
     form.addEventListener("submit", this._newWorkout.bind(this));
@@ -137,6 +140,11 @@ class App {
 
     // Display workout form
     this.#map.on("click", this._showForm.bind(this));
+
+    // Display the previously saved workouts on the map
+    this.#workouts.forEach(workout => {
+      this._workoutPin(workout);
+    });
   }
 
   // Display the workout form for the user to fill
@@ -243,6 +251,9 @@ class App {
 
     // Hide the new workout form
     this._hideForm();
+
+    // Save workouts to local storage
+    this._saveWorkouts();
   }
 
   _workoutPin(workout) {
@@ -338,6 +349,28 @@ class App {
 
     // Add the HTML after the form element
     form.insertAdjacentHTML("afterend", HTML);
+  }
+
+  // Fetch workouts form local storage
+  _fetchWorkouts() {
+    // Fetch the workouts from local storage
+    const workoutsData = JSON.parse(localStorage.getItem("workouts"));
+
+    // If no workouts, do nothing
+    if (!workoutsData) return;
+
+    // Set the previous workouts to the workouts array
+    this.#workouts = workoutsData;
+
+    // Display the workouts on the side menu
+    this.#workouts.forEach(workout => {
+      this._displayWorkout(workout);
+    });
+  }
+
+  // Save the workouts to local storage
+  _saveWorkouts() {
+    localStorage.setItem("workouts", JSON.stringify(this.#workouts));
   }
 }
 
