@@ -1,4 +1,5 @@
 "use strict";
+// Activity Tracker App is Complete
 
 const form = document.querySelector(".form");
 const containerWorkouts = document.querySelector(".workouts");
